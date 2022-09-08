@@ -1,0 +1,18 @@
+{
+  "bitcoin": {
+    "usd": 19224.21,
+    "usd_market_cap": 368343274174.5402
+  },
+  "ethereum": {
+    "usd": 1635.67,
+    "usd_market_cap": 197134179685.0775
+  },
+  "cardano": {
+    "usd": 0.471791,
+    "usd_market_cap": 15975934958.69321
+  },
+  "solana": {
+    "usd": 33.34,
+    "usd_market_cap": 11797593899.589739
+  }
+}
