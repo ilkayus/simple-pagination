@@ -3,12 +3,13 @@ import axios from "axios";
 import Pagination from "./pagination";
 
 import "../css/coin-table.css";
+import { postsPerPage, tableHeaders } from "../util/utils";
 
 export interface Props {}
 
 const CoinTable = (props: Props) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(10);
+  // const [postsPerPage, setPostsPerPage] = useState(10);
   const [marketData, setMarketData] = useState([]);
 
   useEffect(() => {
@@ -24,16 +25,9 @@ const CoinTable = (props: Props) => {
   const table = (
     <table>
       <tr>
-        <th>Cyrpto</th>
-        <th>Symbol</th>
-        <th>Image</th>
-        <th>Current Price</th>
-        <th>Market Cap Rank</th>
-        <th>Usd Market Cap</th>
-        <th>Daily High</th>
-        <th>Daily Low</th>
-        <th>Daily Change</th>
-        <th>Daily Change Percentage</th>
+        {tableHeaders.map((text) => (
+          <th>{text} </th>
+        ))}
       </tr>
       {marketData.map((el: any) => (
         <tr>
@@ -69,7 +63,7 @@ const CoinTable = (props: Props) => {
         postsPerPage={postsPerPage}
         setCurrentPage={setCurrentPage}
         currentPage={currentPage}
-        showFirstLast={true}
+        showFirstLast={false}
         buttonCount={5}
       />
     </div>
