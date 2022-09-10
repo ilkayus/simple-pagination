@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Pagination from "./pagination";
 
 import "../css/coin-table.css";
+import { fetchData } from "../api/provider";
 import { postsPerPage, tableHeaders } from "../util/utils";
 import { ICryptoData } from "../types/response.interface";
 
@@ -14,12 +14,7 @@ const CoinTable = (props: Props) => {
   const [marketData, setMarketData] = useState<ICryptoData[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const call = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${postsPerPage}&page=${currentPage}&sparkline=false`;
-      const response = await axios.get(call);
-      setMarketData(response.data);
-    };
-    fetchData();
+    fetchData(currentPage).then((res) => setMarketData(res));
   }, [currentPage]);
 
   console.log(marketData);
