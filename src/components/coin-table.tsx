@@ -4,13 +4,14 @@ import Pagination from "./pagination";
 
 import "../css/coin-table.css";
 import { postsPerPage, tableHeaders } from "../util/utils";
+import { ICryptoData } from "../types/response.interface";
 
 export interface Props {}
 
 const CoinTable = (props: Props) => {
   const [currentPage, setCurrentPage] = useState(1);
   // const [postsPerPage, setPostsPerPage] = useState(10);
-  const [marketData, setMarketData] = useState([]);
+  const [marketData, setMarketData] = useState<ICryptoData[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
