@@ -1,0 +1,107 @@
+input,
+button {
+  font-family: inherit;
+}
+
+.autocomplete-conteiner {
+  display: flex;
+  flex-direction: column;
+  margin: 10px auto;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+}
+
+.autocomplete-form {
+  display: flex;
+  flex-direction: row;
+}
+
+.autocomplete-input {
+  border: 1px solid rgba(0, 0, 0, 0.54);
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.autocomplete-submit {
+  border: 1px solid #0c311a;
+  padding: 8px 16px;
+  background: #1c7239;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.autocomplete-submit:hover {
+  background: #11916085;
+  cursor: pointer;
+}
+
+.autocomplete-submit svg {
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+}
+
+.autocomplete-results-container {
+  position: absolute;
+  margin-top: 43px;
+  border: 1px solid rgba(0, 0, 0, 0.54);
+  box-shadow: 0px 5px 8px 0px rgba(0, 0, 0, 0.2);
+  overflow-y: scroll;
+  padding: 4px 0;
+  width: 100%;
+  max-width: 600px;
+  max-height: 850px;
+  z-index: 1;
+  list-style: none;
+  transition: none;
+  display: flex;
+  flex-direction: column;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+.autocomplete-results {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  height: 32px;
+  border: 1px solid rgba(0, 0, 0, 0.54);
+  background-color: #fafcfd;
+  margin: 0;
+  padding: 0;
+}
+
+.autocomplete-results:hover {
+  background: rgba(0, 0, 0, 0.918);
+  color: #fff;
+}
+
+.autocomplete-results.selected {
+  background: rgba(1, 49, 17, 0.897);
+  color: #fff;
+}
+
+img {
+  display: block;
+  padding-left: 4px;
+  height: 24px;
+  width: 24px;
+}
+
+h4 {
+  padding-left: 15px;
+  font-weight: 500;
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
