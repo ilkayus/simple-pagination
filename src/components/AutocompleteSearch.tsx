@@ -24,7 +24,7 @@ const AutocompleteSearch = (props: Props) => {
     setSelectedList(() => {
       let list: string[] = [];
       if (searchText.length < 1) return list;
-      filtered.map((e) => e.name);
+      list = filtered.map((e) => e.name);
       return list;
     });
     setAutoList(() => {
