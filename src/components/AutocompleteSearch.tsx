@@ -14,6 +14,7 @@ const AutocompleteSearch = (props: Props) => {
   const inputElement = useRef() as React.MutableRefObject<HTMLInputElement>;
 
   const populateList = (regex: RegExp | null) => {
+    // console.log("pop:", regex);
     let filtered: any[] = [];
     if (regex === null)
       filtered = coinSearch.slice(0, Math.min(coinSearch.length, 25));
@@ -23,19 +24,18 @@ const AutocompleteSearch = (props: Props) => {
         .slice(0, Math.min(coinSearch.length, 25));
     setSelectedList(() => {
       let list: string[] = [];
-      if (searchText.length < 1) return list;
+      // if (searchText.length < 1) return list;
       list = filtered.map((e) => e.name);
       return list;
     });
     setAutoList(() => {
       let Dropdown: JSX.Element[] = [];
-      if (searchText.length < 1) return Dropdown;
+      // if (searchText.length < 1) return Dropdown;
       Dropdown = filtered.map((e: any, index) => {
         return (
           <li
             key={index + 1}
             onMouseDown={(event) => handleListClick(event, e.name)}
-            onMouseOver={() => console.log(e.name, index)}
           >
             <div
               className={
@@ -55,18 +55,22 @@ const AutocompleteSearch = (props: Props) => {
     });
   };
   useEffect(() => {
-    const list = async () => {
-      const response = await axios.get(
-        // "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
-        `https://api.coingecko.com/api/v3/search?query=${searchText}`
-        //`https://api.coingecko.com/api/v3/search?query=""`
-      );
-      // console.log(response);
-      setCoinSearch((coinSearch) => response.data.coins);
-      populateList(null);
-      //  console.log("a", coinSearch);
-    };
-    list();
+    // const list = async () => {
+    //   const response = await axios.get(
+    //     // "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
+    //     `https://api.coingecko.com/api/v3/search?query=${searchText}`
+    //     //`https://api.coingecko.com/api/v3/search?query=""`
+    //   );
+    //   return response.data.coins;
+    // }; const response = await
+    axios
+      .get(`https://api.coingecko.com/api/v3/search?query=${searchText}`)
+      .then((res) => {
+        setCoinSearch(res.data.coins);
+      });
+    console.log("a", coinSearch);
+    populateList(null);
+    //list();
   }, []);
   useEffect(() => {
     // console.log(searchText);
@@ -99,7 +103,10 @@ const AutocompleteSearch = (props: Props) => {
       //  inputFocusOut();
     }
     if (e.key === "Enter") {
-      if (selectedIndex === 0 && searchText !== "") handleSearch();
+      if (selectedIndex === 0 && searchText !== "") {
+        setShowSearchResults(searchText);
+        inputElement.current.blur();
+      }
       setSearchText(selectedList[selectedIndex]);
       setSelectedIndex(0);
       //   inputFocusOut();
@@ -116,9 +123,9 @@ const AutocompleteSearch = (props: Props) => {
     setSearchText("");
   };
   const handleListClick = (event: any, name: string) => {
-    console.log(name, event, event.target.outerText);
-    setSearchText(event.target.outerText);
-    handleSearch();
+    setShowSearchResults(name);
+    inputElement.current.blur();
+    //  handleSearch();
   };
   const handleSearch = () => {
     setShowSearchResults(searchText);
