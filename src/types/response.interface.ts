@@ -24,3 +24,13 @@ export interface ICryptoData {
   total_supply: number;
   total_volume: number;
 }
+
+export interface ISearchBarData {
+  api_symbol: string;
+  id: string;
+  large: string;
+  market_cap_rank: number;
+  name: string;
+  symbol: string;
+  thumb: string;
+}

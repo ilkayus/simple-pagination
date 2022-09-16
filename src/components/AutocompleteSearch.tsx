@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useEffect, useState, useRef } from "react";
+import { fetchSearchBarData } from "../api/provider";
+import { ISearchBarData } from "../types/response.interface";
 import "../css/autocompleteSearch.css";
 
 export interface Props {}
 const AutocompleteSearch = (props: Props) => {
-  const [coinSearch, setCoinSearch] = useState<any[]>([]);
+  const [coinSearch, setCoinSearch] = useState<ISearchBarData[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [autolist, setAutoList] = useState<JSX.Element[]>([]);
   const [autolistMaxLength, setAutoListMaxLength] = useState(0);
@@ -47,13 +49,11 @@ const AutocompleteSearch = (props: Props) => {
 
     setSelectedList(() => {
       let list: string[] = [];
-      // if (searchText.length < 1) return list;
       list = filtered.map((e) => e.name);
       return list;
     });
     setAutoList(() => {
       let Dropdown: JSX.Element[] = [];
-      // if (searchText.length < 1) return Dropdown;
       Dropdown = filtered.map((e: any, index) => {
         return (
           <li
@@ -69,6 +69,7 @@ const AutocompleteSearch = (props: Props) => {
             >
               <img src={e.thumb} alt="coin logo" />
               <h4>{e.name}</h4>
+              <h4 className="market-cap-rank">{e.market_cap_rank}</h4>
             </div>
           </li>
         );
@@ -78,20 +79,10 @@ const AutocompleteSearch = (props: Props) => {
     });
   };
   useEffect(() => {
-    // const list = async () => {
-    //   const response = await axios.get(
-    //     // "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
-    //     `https://api.coingecko.com/api/v3/search?query=${searchText}`
-    //     //`https://api.coingecko.com/api/v3/search?query=""`
-    //   );
-    //   return response.data.coins;
-    // }; const response = await
-    axios
-      .get(`https://api.coingecko.com/api/v3/search?query=${searchText}`)
-      .then((res) => {
-        setCoinSearch(res.data.coins);
-      });
-    console.log("a", coinSearch);
+    fetchSearchBarData().then((res) => {
+      setCoinSearch(res);
+      console.log("a", res);
+    });
     populateList(null);
     //list();
   }, []);
