@@ -12,6 +12,48 @@ const AutocompleteSearch = (props: Props) => {
   const [selectedList, setSelectedList] = useState<string[]>([]);
   const [showSearchResults, setShowSearchResults] = useState("");
   const inputElement = useRef() as React.MutableRefObject<HTMLInputElement>;
+
+  const populateList = (regex: RegExp | null) => {
+    let filtered: any[] = [];
+    if (regex === null)
+      filtered = coinSearch.slice(0, Math.min(coinSearch.length, 25));
+    else
+      filtered = coinSearch
+        .filter((el) => el.name.match(regex))
+        .slice(0, Math.min(coinSearch.length, 25));
+    setSelectedList(() => {
+      let list: string[] = [];
+      if (searchText.length < 1) return list;
+      filtered.map((e) => e.name);
+      return list;
+    });
+    setAutoList(() => {
+      let Dropdown: JSX.Element[] = [];
+      if (searchText.length < 1) return Dropdown;
+      Dropdown = filtered.map((e: any, index) => {
+        return (
+          <li
+            key={index + 1}
+            onMouseDown={(event) => handleListClick(event, e.name)}
+            onMouseOver={() => console.log(e.name, index)}
+          >
+            <div
+              className={
+                selectedIndex === index
+                  ? "autocomplete-results selected"
+                  : "autocomplete-results"
+              }
+            >
+              <img src={e.thumb} alt="coin logo" />
+              <h4>{e.name}</h4>
+            </div>
+          </li>
+        );
+      });
+      return Dropdown;
+      //    .slice(0, Math.min(coinSearch.length, 25));
+    });
+  };
   useEffect(() => {
     const list = async () => {
       const response = await axios.get(
@@ -21,47 +63,17 @@ const AutocompleteSearch = (props: Props) => {
       );
       // console.log(response);
       setCoinSearch((coinSearch) => response.data.coins);
+      populateList(null);
       //  console.log("a", coinSearch);
     };
     list();
   }, []);
   useEffect(() => {
     // console.log(searchText);
-    const regex = new RegExp(`^${searchText}`, "gi");
-    setSelectedList(() => {
-      let list: string[] = [];
-      if (searchText.length < 1) return list;
-      list = coinSearch
-        .filter((el) => el.name.match(regex))
-        .slice(0, Math.min(coinSearch.length, 25))
-        .map((e) => e.name);
-      return list;
-    });
-    setAutoList(() => {
-      let Dropdown: JSX.Element[] = [];
-      if (searchText.length < 1) return Dropdown;
-      Dropdown = coinSearch
-        .filter((el) => el.name.match(regex))
-        .slice(0, Math.min(coinSearch.length, 25))
-        .map((e: any, index) => {
-          return (
-            <li key={index + 1}>
-              <div
-                className={
-                  selectedIndex === index
-                    ? "autocomplete-results selected"
-                    : "autocomplete-results"
-                }
-              >
-                <img src={e.thumb} alt="coin logo" />
-                <h4>{e.name}</h4>
-              </div>
-            </li>
-          );
-        });
-      return Dropdown;
-      //    .slice(0, Math.min(coinSearch.length, 25));
-    });
+    let regex: RegExp | null = null;
+    if (searchText === "") regex = null;
+    else regex = new RegExp(`^${searchText}`, "gi");
+    populateList(regex);
     //   console.log(autolist);
   }, [searchText, coinSearch, selectedIndex]);
 
@@ -103,7 +115,11 @@ const AutocompleteSearch = (props: Props) => {
     setSelectedIndex(0);
     setSearchText("");
   };
-
+  const handleListClick = (event: any, name: string) => {
+    console.log(name, event, event.target.outerText);
+    setSearchText(event.target.outerText);
+    handleSearch();
+  };
   const handleSearch = () => {
     setShowSearchResults(searchText);
     inputElement.current.blur();
@@ -113,7 +129,7 @@ const AutocompleteSearch = (props: Props) => {
     <div className="autocomplete-conteiner">
       <div className="autocomplete-form">
         <input
-          type="text"
+          type="search"
           ref={inputElement}
           className="autocomplete-input"
           placeholder="Search for cyrpto currencies..."
