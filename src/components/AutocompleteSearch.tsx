@@ -7,6 +7,7 @@ const AutocompleteSearch = (props: Props) => {
   const [coinSearch, setCoinSearch] = useState<any[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [autolist, setAutoList] = useState<JSX.Element[]>([]);
+  const [autolistMaxLength, setAutoListMaxLength] = useState(0);
   const [showAutoList, setShowAutoList] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [selectedList, setSelectedList] = useState<string[]>([]);
@@ -14,14 +15,36 @@ const AutocompleteSearch = (props: Props) => {
   const inputElement = useRef() as React.MutableRefObject<HTMLInputElement>;
 
   const populateList = (regex: RegExp | null) => {
-    // console.log("pop:", regex);
     let filtered: any[] = [];
-    if (regex === null)
-      filtered = coinSearch.slice(0, Math.min(coinSearch.length, 25));
-    else
+    if (regex === null) {
+      setAutoListMaxLength(coinSearch.length);
+      filtered = coinSearch.slice(
+        Math.max(selectedIndex - 8, 0),
+        Math.min(autolistMaxLength, selectedIndex + 12)
+      );
+    } else {
+      setAutoListMaxLength(
+        coinSearch.filter((el) => el.name.match(regex)).length
+      );
       filtered = coinSearch
         .filter((el) => el.name.match(regex))
-        .slice(0, Math.min(coinSearch.length, 25));
+        .slice(
+          Math.max(selectedIndex - 8, 0),
+          Math.min(autolistMaxLength, selectedIndex + 12)
+        );
+    }
+
+    console.log(
+      "pop:",
+      autolistMaxLength,
+      "index:",
+      selectedIndex,
+      "listLen:",
+      filtered.length,
+      "m:",
+      Math.min(autolistMaxLength, selectedIndex + 12)
+    );
+
     setSelectedList(() => {
       let list: string[] = [];
       // if (searchText.length < 1) return list;
@@ -39,7 +62,7 @@ const AutocompleteSearch = (props: Props) => {
           >
             <div
               className={
-                selectedIndex === index
+                selectedIndex === index + Math.max(selectedIndex - 8, 0)
                   ? "autocomplete-results selected"
                   : "autocomplete-results"
               }
@@ -92,13 +115,13 @@ const AutocompleteSearch = (props: Props) => {
       inputElement.current.blur();
     }
     if (e.key === "ArrowDown") {
-      setSelectedIndex((el) => Math.min(el + 1, selectedList.length - 1));
+      setSelectedIndex((el) => Math.min(el + 1, autolistMaxLength - 1));
     }
     if (e.key === "ArrowUp") {
       setSelectedIndex((el) => Math.max(el - 1, 0));
     }
     if (e.key === "ArrowRight") {
-      setSearchText(selectedList[selectedIndex]);
+      setSearchText(selectedList[Math.min(selectedIndex, 8)]);
       setSelectedIndex(0);
       //  inputFocusOut();
     }
@@ -107,11 +130,10 @@ const AutocompleteSearch = (props: Props) => {
         setShowSearchResults(searchText);
         inputElement.current.blur();
       }
-      setSearchText(selectedList[selectedIndex]);
+      setSearchText(selectedList[Math.min(selectedIndex, 8)]);
       setSelectedIndex(0);
       //   inputFocusOut();
     }
-    console.log(selectedIndex);
     //  if (e.key === "Enter") { }
   };
   const inputFocus = () => {
