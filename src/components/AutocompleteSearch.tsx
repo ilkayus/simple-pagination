@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useEffect, useState, useRef } from "react";
 import { fetchSearchBarData } from "../api/provider";
 import { ISearchBarData } from "../types/response.interface";
@@ -17,7 +16,7 @@ const AutocompleteSearch = (props: Props) => {
   const inputElement = useRef() as React.MutableRefObject<HTMLInputElement>;
 
   const populateList = (regex: RegExp | null) => {
-    let filtered: any[] = [];
+    let filtered: ISearchBarData[] = [];
     if (regex === null) {
       setAutoListMaxLength(coinSearch.length);
       filtered = coinSearch.slice(
@@ -35,26 +34,13 @@ const AutocompleteSearch = (props: Props) => {
           Math.min(autolistMaxLength, selectedIndex + 12)
         );
     }
-
-    console.log(
-      "pop:",
-      autolistMaxLength,
-      "index:",
-      selectedIndex,
-      "listLen:",
-      filtered.length,
-      "m:",
-      Math.min(autolistMaxLength, selectedIndex + 12)
-    );
-
     setSelectedList(() => {
       let list: string[] = [];
       list = filtered.map((e) => e.name);
       return list;
     });
     setAutoList(() => {
-      let Dropdown: JSX.Element[] = [];
-      Dropdown = filtered.map((e: any, index) => {
+      let Dropdown = filtered.map((e, index) => {
         return (
           <li
             key={index + 1}
@@ -133,10 +119,11 @@ const AutocompleteSearch = (props: Props) => {
   const inputFocusOut = () => {
     setShowAutoList(false);
     setSelectedIndex(0);
-    setSearchText("");
+    // setSearchText("");
   };
   const handleListClick = (event: any, name: string) => {
     setShowSearchResults(name);
+    setSearchText(name);
     inputElement.current.blur();
     //  handleSearch();
   };
