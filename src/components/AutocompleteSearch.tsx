@@ -2,116 +2,77 @@ import { useEffect, useState, useRef } from "react";
 import { fetchSearchBarData } from "../api/provider";
 import { ISearchBarData } from "../types/response.interface";
 import "../css/autocompleteSearch.css";
+import SearchBarListLi from "./SearchBarListLi";
 
-export interface Props {}
-const AutocompleteSearch = (props: Props) => {
+const MAX_LENGTH = 50;
+
+const AutocompleteSearch = () => {
   const [coinSearch, setCoinSearch] = useState<ISearchBarData[]>([]);
   const [searchText, setSearchText] = useState<string>("");
-  const [autolist, setAutoList] = useState<JSX.Element[]>([]);
-  const [autolistMaxLength, setAutoListMaxLength] = useState(0);
+  const [autolist, setAutoList] = useState<ISearchBarData[]>([]);
   const [showAutoList, setShowAutoList] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const [selectedList, setSelectedList] = useState<string[]>([]);
   const [showSearchResults, setShowSearchResults] = useState("");
+  const [scrollPosition, setScrollPosition] = useState(0);
   const inputElement = useRef() as React.MutableRefObject<HTMLInputElement>;
 
   const populateList = (regex: RegExp | null) => {
-    let filtered: ISearchBarData[] = [];
-    if (regex === null) {
-      setAutoListMaxLength(coinSearch.length);
-      filtered = coinSearch.slice(
-        Math.max(selectedIndex - 8, 0),
-        Math.min(autolistMaxLength, selectedIndex + 12)
-      );
-    } else {
-      setAutoListMaxLength(
-        coinSearch.filter((el) => el.name.match(regex)).length
-      );
-      filtered = coinSearch
-        .filter((el) => el.name.match(regex))
-        .slice(
-          Math.max(selectedIndex - 8, 0),
-          Math.min(autolistMaxLength, selectedIndex + 12)
-        );
-    }
-    setSelectedList(() => {
-      let list: string[] = [];
-      list = filtered.map((e) => e.name);
-      return list;
-    });
     setAutoList(() => {
-      let Dropdown = filtered.map((e, index) => {
-        return (
-          <li
-            key={index + 1}
-            onMouseDown={(event) => handleListClick(event, e.name)}
-          >
-            <div
-              className={
-                selectedIndex === index + Math.max(selectedIndex - 8, 0)
-                  ? "autocomplete-results selected"
-                  : "autocomplete-results"
-              }
-            >
-              <img src={e.thumb} alt="coin logo" />
-              <h4>{e.name}</h4>
-              <h4 className="market-cap-rank">{e.market_cap_rank}</h4>
-            </div>
-          </li>
-        );
-      });
-      return Dropdown;
-      //    .slice(0, Math.min(coinSearch.length, 25));
+      if (regex === null) return coinSearch.slice(0, MAX_LENGTH);
+      return coinSearch
+        .filter((el) => el.name.match(regex))
+        .slice(0, MAX_LENGTH);
     });
   };
+
+  useEffect(() => {
+    if (selectedIndex > scrollPosition + 11)
+      setScrollPosition(selectedIndex - 11);
+    if (selectedIndex < scrollPosition) setScrollPosition(selectedIndex);
+  }, [selectedIndex]);
+
   useEffect(() => {
     fetchSearchBarData().then((res) => {
       setCoinSearch(res);
-      console.log("a", res);
     });
     populateList(null);
-    //list();
   }, []);
+
   useEffect(() => {
-    // console.log(searchText);
     let regex: RegExp | null = null;
     if (searchText === "") regex = null;
     else regex = new RegExp(`^${searchText}`, "gi");
     populateList(regex);
-    //   console.log(autolist);
   }, [searchText, coinSearch, selectedIndex]);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
     setSelectedIndex(0);
   };
 
-  const handleKeyDown = (e: any) => {
-    console.log(e.key);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       inputElement.current.blur();
     }
     if (e.key === "ArrowDown") {
-      setSelectedIndex((el) => Math.min(el + 1, autolistMaxLength - 1));
+      setSelectedIndex((el) => Math.min(el + 1, autolist.length - 1));
     }
     if (e.key === "ArrowUp") {
       setSelectedIndex((el) => Math.max(el - 1, 0));
     }
     if (e.key === "ArrowRight") {
-      setSearchText(selectedList[Math.min(selectedIndex, 8)]);
+      setSearchText(autolist[selectedIndex].name);
       setSelectedIndex(0);
-      //  inputFocusOut();
     }
     if (e.key === "Enter") {
       if (selectedIndex === 0 && searchText !== "") {
         setShowSearchResults(searchText);
         inputElement.current.blur();
       }
-      setSearchText(selectedList[Math.min(selectedIndex, 8)]);
+      setShowAutoList(false);
+      setSearchText(autolist[selectedIndex].name);
       setSelectedIndex(0);
-      //   inputFocusOut();
     }
-    //  if (e.key === "Enter") { }
   };
   const inputFocus = () => {
     setShowAutoList(true);
@@ -119,13 +80,11 @@ const AutocompleteSearch = (props: Props) => {
   const inputFocusOut = () => {
     setShowAutoList(false);
     setSelectedIndex(0);
-    // setSearchText("");
   };
   const handleListClick = (event: any, name: string) => {
     setShowSearchResults(name);
-    setSearchText(name);
     inputElement.current.blur();
-    //  handleSearch();
+    setSearchText(name);
   };
   const handleSearch = () => {
     setShowSearchResults(searchText);
@@ -157,20 +116,23 @@ const AutocompleteSearch = (props: Props) => {
           </svg>
         </button>
       </div>
-      {showSearchResults === "" ? (
-        ""
-      ) : (
-        <h4>Searching for {showSearchResults}</h4>
+      {showSearchResults && <h4>Searching for {showSearchResults}</h4>}
+      {showAutoList && (
+        <ul className="autocomplete-results-container">
+          {autolist.map((el, index) => {
+            return (
+              <SearchBarListLi
+                key={el.name}
+                el={el}
+                index={index}
+                scrollPosition={scrollPosition}
+                selectedIndex={selectedIndex}
+                handleListClick={handleListClick}
+              />
+            );
+          })}
+        </ul>
       )}
-      <ul
-        className={
-          showAutoList
-            ? "autocomplete-results-container"
-            : "autocomplete-results-container hidden"
-        }
-      >
-        {autolist}
-      </ul>
     </div>
   );
 };
