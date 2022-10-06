@@ -93,7 +93,7 @@ const Pagination = ({
 
 Pagination.defaultProps = {
   totalPosts: 100,
-  showFirstLast: false,
+  showFirstLast: true,
   buttonCount: 5,
 };
 
